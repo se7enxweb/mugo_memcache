@@ -1,0 +1,35 @@
+--- view.php	2014-02-10 12:15:59.000000000 +0100
++++ view.php.patched	2014-02-10 12:15:46.000000000 +0100
+@@ -174,15 +174,29 @@
+             false
+         );
+ 
++        $mugoMemCacheBlock = MugoMemCacheBlock::instance();
++        
++        $result = $mugoMemCacheBlock->get( $cacheFileArray['cache_path'] );
++        
++        if( $result === false )
++        {
++            $data = eZNodeviewfunctions::contentViewGenerate( false, $args );
++            
++            $result = $data[ 'content' ]; // Return the $Result array
++            
++            $mugoMemCacheBlock->put( $cacheFileArray['cache_path'], $result, 60, 0, $NodeID );
++        }
++        
++        /*
+         $result = eZClusterFileHandler::instance( $cacheFileArray['cache_path'] )
+             ->processCache(
+-                array( 'eZNodeviewfunctions', 'contentViewRetrieve' ),
+-                array( 'eZNodeviewfunctions', 'contentViewGenerate' ),
++                array( 'MugoMemCacheBlock', 'contentViewRetrieve' ),
++                array( 'MugoMemCacheBlock', 'contentViewGenerate' ),
+                 null,
+                 null,
+                 $args
+             );
+-
++        */
+         if ( isset( $result['responseHeaders'] ) )
+         {
+             foreach ( $result['responseHeaders'] as $header )
